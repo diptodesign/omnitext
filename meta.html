@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meta Tag Generator · OmniTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    :root { --primary: #10b981; --primary-dark: #059669; }
+    body { font-family:"Inter",sans-serif; background:#f0f5fe; min-height:100vh; display:flex; flex-direction:column; }
+    .site-header { background:rgba(255,255,255,0.65); backdrop-filter:blur(16px); padding:0.9rem 0; border-bottom:1px solid rgba(16,185,129,0.2); }
+    .header-container { max-width:1100px; margin:0 auto; padding:0 1.8rem; display:flex; align-items:center; justify-content:space-between; }
+    .logo { display:flex; align-items:center; gap:0.75rem; }
+    .logo-icon { background:linear-gradient(145deg, var(--primary-dark), var(--primary)); width:2.8rem; height:2.8rem; border-radius:0.9rem; display:flex; align-items:center; justify-content:center; color:white; font-size:1.6rem; font-weight:700; }
+    .logo-text { font-weight:700; font-size:1.5rem; color:#0f2b4b; }
+    .main-content { flex:1; display:flex; align-items:center; justify-content:center; padding:2rem; }
+    .card { max-width:900px; width:100%; background:rgba(255,255,255,0.75); backdrop-filter:blur(18px); border-radius:2rem; padding:2.5rem; }
+    h1 { margin-bottom:1.5rem; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    .form-group { margin-bottom:1rem; }
+    label { font-weight:500; display:block; margin-bottom:0.3rem; }
+    input, textarea { width:100%; padding:0.8rem 1rem; border-radius:40px; border:1.8px solid #d7e2f5; font-family:inherit; }
+    textarea { border-radius:1rem; height:80px; }
+    button { background:var(--primary); border:none; padding:1rem 2rem; border-radius:60px; color:white; font-weight:600; cursor:pointer; margin-right:1rem; }
+    button:hover { background:var(--primary-dark); }
+    .output-area { margin-top:2rem; }
+    .code-block { background:#1e293b; color:#e2e8f0; padding:1.5rem; border-radius:1rem; font-family:monospace; white-space:pre-wrap; }
+    .copy-btn { background:white; color:var(--primary); border:1px solid #d0e0f0; }
+    .footer-ad { margin-top:2rem; background:rgba(240,244,254,0.6); border-radius:1rem; padding:1rem; text-align:center; border:1px dashed #a0bbdf; }
+    .site-footer { background:rgba(255,255,255,0.4); backdrop-filter:blur(8px); padding:1.5rem; border-top:1px solid rgba(16,185,129,0.1); }
+    .footer-container { max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; }
+    .dipto-brand { background:rgba(16,185,129,0.05); padding:0.3rem 1rem; border-radius:40px; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-container">
+    <div class="logo">
+      <div class="logo-icon">🏷️</div>
+      <div class="logo-text">Meta<span style="font-weight:400;">Tags</span></div>
+    </div>
+  </div>
+</header>
+<main class="main-content">
+  <div class="card">
+    <h1><i class="fas fa-tags" style="color:#10b981;"></i> SEO Meta Tag Generator</h1>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="title" placeholder="My Awesome Website" value="OmniTools - Free Online Utilities">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="desc" placeholder="Page description" value="Collection of free online tools for developers and designers.">
+      </div>
+      <div class="form-group">
+        <label>Keywords</label>
+        <input type="text" id="keywords" placeholder="keyword1, keyword2" value="tools, utilities, free, online">
+      </div>
+      <div class="form-group">
+        <label>Author</label>
+        <input type="text" id="author" value="Dipto Design LLC">
+      </div>
+      <div class="form-group">
+        <label>Viewport</label>
+        <input type="text" id="viewport" value="width=device-width, initial-scale=1.0">
+      </div>
+      <div class="form-group">
+        <label>Charset</label>
+        <input type="text" id="charset" value="UTF-8">
+      </div>
+    </div>
+    <button id="generateBtn"><i class="fas fa-code"></i> Generate Meta Tags</button>
+    <button class="copy-btn" id="copyBtn"><i class="far fa-copy"></i> Copy Code</button>
+    <div class="output-area">
+      <h3>Generated Meta Tags</h3>
+      <div class="code-block" id="codeOutput"></div>
+    </div>
+    <div class="footer-ad"><span class="ad-label">Ad</span> AdSense Ready</div>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="footer-container">
+    <div>© 2026 · <span class="dipto-brand"><i class="fas fa-paint-brush"></i> Dipto Design LLC</span></div>
+    <div><a href="#">Privacy</a> · <a href="#">Terms</a></div>
+  </div>
+</footer>
+<script>
+  const titleInp = document.getElementById('title');
+  const descInp = document.getElementById('desc');
+  const keywordsInp = document.getElementById('keywords');
+  const authorInp = document.getElementById('author');
+  const viewportInp = document.getElementById('viewport');
+  const charsetInp = document.getElementById('charset');
+  const output = document.getElementById('codeOutput');
+
+  function generate() {
+    const tags = [
+      `<meta charset="${charsetInp.value}">`,
+      `<meta name="viewport" content="${viewportInp.value}">`,
+      `<title>${titleInp.value}</title>`,
+      `<meta name="description" content="${descInp.value}">`,
+      `<meta name="keywords" content="${keywordsInp.value}">`,
+      `<meta name="author" content="${authorInp.value}">`,
+      `<!-- Open Graph / Social -->`,
+      `<meta property="og:title" content="${titleInp.value}">`,
+      `<meta property="og:description" content="${descInp.value}">`,
+      `<meta property="og:type" content="website">`,
+      `<meta name="twitter:card" content="summary_large_image">`
+    ];
+    output.textContent = tags.join('\n');
+  }
+  generate();
+  document.getElementById('generateBtn').addEventListener('click', generate);
+  document.getElementById('copyBtn').addEventListener('click', ()=>{
+    navigator.clipboard?.writeText(output.textContent);
+    alert('Copied!');
+  });
+</script>
+</body>
+</html>
