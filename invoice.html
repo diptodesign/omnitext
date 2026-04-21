@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Invoice Generator · OmniTools</title>
+  <meta name="description" content="Create professional invoices online for free. Add your company details, client info, line items, and download as PDF.">
+  <meta name="keywords" content="invoice generator, free invoice maker, PDF invoice, online billing, small business tools">
+  <meta name="author" content="OmniTools">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- jsPDF for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #2563eb; --primary-dark: #1d4ed8;
+      --bg-gradient-start: #f0f5fe; --surface-glass: rgba(255, 255, 255, 0.75);
+      --shadow-lg: 0 25px 50px -10px rgba(0, 27, 58, 0.15); --text-dark: #0b1e33;
+      --text-soft: #1e3a6f; --text-muted: #476085; --radius-card: 2rem;
+      --transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    body {
+      font-family: "Inter", sans-serif; background: var(--bg-gradient-start);
+      background-image: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.06) 0%, transparent 30%);
+      min-height: 100vh; display: flex; flex-direction: column; color: var(--text-dark);
+      line-height: 1.5; -webkit-font-smoothing: antialiased;
+    }
+    .site-header {
+      background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(37, 99, 235, 0.12); padding: 0.9rem 0;
+    }
+    .header-container {
+      max-width: 1280px; margin: 0 auto; padding: 0 1.8rem;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+    .logo { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-icon {
+      background: linear-gradient(145deg, var(--primary-dark), var(--primary));
+      width: 2.8rem; height: 2.8rem; border-radius: 0.9rem; display: flex;
+      align-items: center; justify-content: center; color: white; font-size: 1.6rem;
+      font-weight: 700; box-shadow: 0 8px 14px -6px rgba(37, 99, 235, 0.3);
+    }
+    .logo-text { font-weight: 700; font-size: 1.7rem; letter-spacing: -0.02em; color: #0f2b4b; }
+    .main-nav { display: flex; gap: 2rem; align-items: center; }
+    .main-nav a {
+      text-decoration: none; color: var(--text-soft); font-weight: 550; font-size: 1rem;
+      transition: var(--transition); padding-bottom: 4px; border-bottom: 2px solid transparent;
+    }
+    .main-nav a:hover, .main-nav a.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .dropdown { position: relative; display: inline-block; }
+    .dropbtn {
+      background: none; border: none; color: var(--text-soft); font-weight: 550; font-size: 1rem;
+      cursor: pointer; padding: 0 0 4px 0; border-bottom: 2px solid transparent;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .dropdown-content {
+      display: none; position: absolute; top: 100%; left: 0; background: rgba(255,255,255,0.95);
+      min-width: 200px; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      backdrop-filter: blur(8px); padding: 0.5rem 0; z-index: 30;
+    }
+    .dropdown-content a {
+      display: block; padding: 0.7rem 1.5rem; color: var(--text-soft);
+    }
+    .dropdown-content a:hover { background: #eef2ff; }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown:hover .dropbtn { color: var(--primary); border-bottom-color: var(--primary); }
+
+    .main-content { flex: 1; padding: 2.5rem 1.5rem; }
+    .invoice-card {
+      max-width: 1200px; margin: 0 auto; background: var(--surface-glass); backdrop-filter: blur(18px);
+      border-radius: var(--radius-card); box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,0.6) inset;
+      padding: 2.5rem 2.2rem; border: 1px solid rgba(255,255,255,0.3);
+    }
+    h1 { font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .subhead { color: var(--text-muted); margin-bottom: 2rem; }
+    .form-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;
+    }
+    @media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-section {
+      background: rgba(255,255,255,0.4); border-radius: 1.5rem; padding: 1.5rem;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+    .form-section h3 { margin-bottom: 1rem; font-weight: 600; color: var(--text-soft); }
+    .input-group { margin-bottom: 1rem; }
+    label { display: block; font-weight: 500; color: var(--text-soft); margin-bottom: 0.3rem; font-size: 0.9rem; }
+    input, textarea {
+      width: 100%; padding: 0.7rem 1rem; border-radius: 40px; border: 1.8px solid #d7e2f5;
+      background: white; font-size: 0.95rem; font-family: inherit; transition: var(--transition);
+    }
+    textarea { border-radius: 1rem; resize: vertical; }
+    input:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+    /* Items table */
+    .items-section { margin: 2rem 0; }
+    .items-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .items-table { width: 100%; border-collapse: collapse; }
+    .items-table th {
+      text-align: left; padding: 0.8rem 0.5rem; color: var(--text-soft); font-weight: 600;
+      border-bottom: 2px solid #d7e2f5;
+    }
+    .items-table td { padding: 0.6rem 0.5rem; border-bottom: 1px solid #e2e8f0; }
+    .items-table input {
+      width: 100%; padding: 0.5rem; border-radius: 20px; border: 1px solid #d7e2f5;
+      background: rgba(255,255,255,0.8);
+    }
+    .remove-btn {
+      background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1.2rem;
+    }
+    .add-btn {
+      background: white; border: 1.5px solid var(--primary); color: var(--primary);
+      padding: 0.5rem 1.2rem; border-radius: 40px; font-weight: 500; cursor: pointer;
+      margin-top: 0.8rem;
+    }
+
+    .totals {
+      margin-top: 1.5rem; text-align: right; font-size: 1.1rem;
+    }
+    .totals p { margin: 0.3rem 0; }
+    .grand-total { font-weight: 700; font-size: 1.4rem; color: var(--primary); }
+
+    .action-buttons {
+      display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;
+    }
+    .btn {
+      background: white; border: 1.5px solid #cbdded; padding: 0.9rem 2rem;
+      border-radius: 60px; font-weight: 600; font-size: 1rem; color: #1f3a5e;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.02); transition: var(--transition);
+    }
+    .btn-primary {
+      background: var(--primary); border-color: var(--primary); color: white;
+      box-shadow: 0 12px 24px -8px rgba(37,99,235,0.4);
+    }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+    .footer-ad {
+      margin-top: 2rem; background: rgba(240, 244, 254, 0.6); backdrop-filter: blur(8px);
+      border: 1px dashed #a0bbdf; border-radius: 1.4rem; padding: 1.2rem; text-align: center;
+    }
+    .site-footer {
+      background: rgba(255,255,255,0.4); backdrop-filter: blur(8px); padding: 1.5rem 1.8rem;
+      border-top: 1px solid rgba(37,99,235,0.1);
+    }
+    .footer-container {
+      max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 1rem;
+    }
+    .dipto-brand { background: rgba(37, 99, 235, 0.05); padding: 0.3rem 1rem; border-radius: 40px; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-container">
+    <div class="logo">
+      <div class="logo-icon">📄</div>
+      <div class="logo-text">Omni<span style="font-weight:400;">Invoice</span></div>
+    </div>
+    <nav class="main-nav">
+      <a href="../index.html">Home</a>
+      <div class="dropdown">
+        <button class="dropbtn">Tools <i class="fas fa-chevron-down"></i></button>
+        <div class="dropdown-content">
+          <a href="../shorten/"><i class="fas fa-link"></i> URL Shortener</a>
+          <a href="../lorem/"><i class="fas fa-paragraph"></i> Lorem Ipsum</a>
+          <a href="../meta/"><i class="fas fa-tags"></i> Meta Tags</a>
+          <a href="../color/"><i class="fas fa-palette"></i> Color Picker</a>
+          <a href="../invoice/"><i class="fas fa-file-invoice"></i> Invoice</a>
+        </div>
+      </div>
+      <a href="../privacy.html">Privacy</a>
+      <a href="../terms.html">Terms</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="invoice-card">
+    <h1><i class="fas fa-file-invoice" style="color:#2563eb;"></i> Invoice Generator</h1>
+    <div class="subhead">Fill in details, add items, and download a professional PDF invoice.</div>
+
+    <div class="form-grid">
+      <div class="form-section">
+        <h3><i class="fas fa-building"></i> Your Company</h3>
+        <div class="input-group"><label>Company Name</label><input type="text" id="companyName" value="Dipto Design LLC"></div>
+        <div class="input-group"><label>Address</label><input type="text" id="companyAddress" value="123 Creative St, Design City"></div>
+        <div class="input-group"><label>Email</label><input type="email" id="companyEmail" value="hello@diptodesign.com"></div>
+        <div class="input-group"><label>Phone</label><input type="text" id="companyPhone" value="+1 (555) 123-4567"></div>
+      </div>
+      <div class="form-section">
+        <h3><i class="fas fa-user"></i> Bill To</h3>
+        <div class="input-group"><label>Client Name</label><input type="text" id="clientName" value="John Smith"></div>
+        <div class="input-group"><label>Client Company</label><input type="text" id="clientCompany" value="Acme Inc."></div>
+        <div class="input-group"><label>Address</label><input type="text" id="clientAddress" value="456 Client Ave, Business Town"></div>
+        <div class="input-group"><label>Email</label><input type="email" id="clientEmail" value="john@acme.com"></div>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="input-group"><label>Invoice #</label><input type="text" id="invoiceNumber" value="INV-2026-001"></div>
+      <div class="input-group"><label>Date</label><input type="date" id="invoiceDate"></div>
+      <div class="input-group"><label>Due Date</label><input type="date" id="dueDate"></div>
+      <div class="input-group"><label>Currency</label>
+        <select id="currency" style="width:100%; padding:0.7rem; border-radius:40px; border:1.8px solid #d7e2f5;">
+          <option value="$">USD ($)</option><option value="€">EUR (€)</option><option value="£">GBP (£)</option><option value="₹">INR (₹)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="items-section">
+      <div class="items-header">
+        <h3><i class="fas fa-list"></i> Line Items</h3>
+        <button class="add-btn" id="addItemBtn"><i class="fas fa-plus"></i> Add Item</button>
+      </div>
+      <table class="items-table" id="itemsTable">
+        <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Tax (%)</th><th>Amount</th><th></th></tr></thead>
+        <tbody id="itemsBody">
+          <!-- items will be added here -->
+        </tbody>
+      </table>
+
+      <div class="totals" id="totalsSection">
+        <p>Subtotal: <span id="subtotal">$0.00</span></p>
+        <p>Tax: <span id="taxTotal">$0.00</span></p>
+        <p class="grand-total">Total: <span id="grandTotal">$0.00</span></p>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>Notes / Terms</label>
+      <textarea id="notes" rows="2" placeholder="Thank you for your business!"></textarea>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn btn-primary" id="generatePDF"><i class="fas fa-download"></i> Download PDF</button>
+      <button class="btn" id="previewBtn"><i class="fas fa-eye"></i> Preview Invoice</button>
+    </div>
+
+    <div class="footer-ad">
+      <span class="ad-label" style="background:#fff; padding:2px 10px; border-radius:30px;">Ad</span> 
+      <span>✨ Your advertisement here — AdSense ready ✨</span>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-container">
+    <div>© 2026 · <span class="dipto-brand"><i class="fas fa-bezier-curve"></i> Dipto Design LLC</span></div>
+    <div><a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a> · <a href="../contact.html">Contact</a></div>
+  </div>
+</footer>
+
+<script>
+  (function() {
+    const { jsPDF } = window.jspdf;
+    
+    // Set default dates
+    const today = new Date().toISOString().split('T')[0];
+    const nextMonth = new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
+    document.getElementById('invoiceDate').value = today;
+    document.getElementById('dueDate').value = nextMonth;
+
+    // Sample items
+    let items = [
+      { description: 'Web Design', quantity: 1, price: 1200, tax: 0 },
+      { description: 'Development', quantity: 20, price: 85, tax: 10 },
+    ];
+
+    const itemsBody = document.getElementById('itemsBody');
+    const subtotalSpan = document.getElementById('subtotal');
+    const taxTotalSpan = document.getElementById('taxTotal');
+    const grandTotalSpan = document.getElementById('grandTotal');
+    const currencySelect = document.getElementById('currency');
+
+    function renderItems() {
+      itemsBody.innerHTML = '';
+      items.forEach((item, index) => {
+        const row = document.createElement('tr');
+        const amount = item.quantity * item.price;
+        row.innerHTML = `
+          <td><input type="text" value="${item.description}" data-index="${index}" data-field="description" style="min-width:120px;"></td>
+          <td><input type="number" value="${item.quantity}" data-index="${index}" data-field="quantity" min="1" step="1" style="width:80px;"></td>
+          <td><input type="number" value="${item.price}" data-index="${index}" data-field="price" min="0" step="0.01" style="width:100px;"></td>
+          <td><input type="number" value="${item.tax}" data-index="${index}" data-field="tax" min="0" max="100" step="0.1" style="width:80px;"></td>
+          <td>${formatCurrency(amount)}</td>
+          <td><button class="remove-btn" data-index="${index}"><i class="fas fa-trash-alt"></i></button></td>
+        `;
+        itemsBody.appendChild(row);
+      });
+
+      // Attach listeners
+      document.querySelectorAll('#itemsTable input').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const index = e.target.dataset.index;
+          const field = e.target.dataset.field;
+          let value = e.target.value;
+          if (field !== 'description') value = parseFloat(value) || 0;
+          items[index][field] = value;
+          renderItems();
+        });
+      });
+
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = btn.dataset.index;
+          items.splice(index, 1);
+          if (items.length === 0) items.push({ description: '', quantity: 1, price: 0, tax: 0 });
+          renderItems();
+        });
+      });
+
+      calculateTotals();
+    }
+
+    function formatCurrency(val) {
+      const sym = currencySelect.value;
+      return `${sym}${val.toFixed(2)}`;
+    }
+
+    function calculateTotals() {
+      let subtotal = 0, taxTotal = 0;
+      items.forEach(item => {
+        const lineAmount = item.quantity * item.price;
+        subtotal += lineAmount;
+        taxTotal += lineAmount * (item.tax / 100);
+      });
+      const grand = subtotal + taxTotal;
+      const sym = currencySelect.value;
+      subtotalSpan.textContent = `${sym}${subtotal.toFixed(2)}`;
+      taxTotalSpan.textContent = `${sym}${taxTotal.toFixed(2)}`;
+      grandTotalSpan.textContent = `${sym}${grand.toFixed(2)}`;
+    }
+
+    document.getElementById('addItemBtn').addEventListener('click', () => {
+      items.push({ description: 'New Item', quantity: 1, price: 0, tax: 0 });
+      renderItems();
+    });
+
+    currencySelect.addEventListener('change', () => {
+      calculateTotals();
+      renderItems(); // update displayed amounts
+    });
+
+    function getFormData() {
+      return {
+        company: {
+          name: document.getElementById('companyName').value,
+          address: document.getElementById('companyAddress').value,
+          email: document.getElementById('companyEmail').value,
+          phone: document.getElementById('companyPhone').value,
+        },
+        client: {
+          name: document.getElementById('clientName').value,
+          company: document.getElementById('clientCompany').value,
+          address: document.getElementById('clientAddress').value,
+          email: document.getElementById('clientEmail').value,
+        },
+        invoice: {
+          number: document.getElementById('invoiceNumber').value,
+          date: document.getElementById('invoiceDate').value,
+          dueDate: document.getElementById('dueDate').value,
+          currency: currencySelect.value,
+        },
+        items: items,
+        notes: document.getElementById('notes').value,
+      };
+    }
+
+    function generatePDF() {
+      const data = getFormData();
+      const doc = new jsPDF();
+      const sym = data.invoice.currency;
+      
+      // Company header
+      doc.setFontSize(20); doc.setTextColor(37, 99, 235);
+      doc.text(data.company.name, 20, 20);
+      doc.setFontSize(10); doc.setTextColor(100);
+      doc.text(data.company.address, 20, 27);
+      doc.text(`Email: ${data.company.email} | Phone: ${data.company.phone}`, 20, 34);
+      
+      // Invoice title
+      doc.setFontSize(16); doc.setTextColor(0);
+      doc.text('INVOICE', 150, 20, { align: 'right' });
+      doc.setFontSize(10);
+      doc.text(`Invoice #: ${data.invoice.number}`, 150, 30, { align: 'right' });
+      doc.text(`Date: ${data.invoice.date}`, 150, 37, { align: 'right' });
+      doc.text(`Due Date: ${data.invoice.dueDate}`, 150, 44, { align: 'right' });
+      
+      // Bill To
+      doc.setFontSize(12); doc.setTextColor(37, 99, 235);
+      doc.text('Bill To:', 20, 50);
+      doc.setFontSize(10); doc.setTextColor(0);
+      doc.text(`${data.client.name}`, 20, 58);
+      if (data.client.company) doc.text(`${data.client.company}`, 20, 65);
+      doc.text(data.client.address, 20, 72);
+      doc.text(data.client.email, 20, 79);
+      
+      // Items table
+      const tableRows = data.items.map(item => [
+        item.description,
+        item.quantity.toString(),
+        `${sym}${item.price.toFixed(2)}`,
+        `${item.tax}%`,
+        `${sym}${(item.quantity * item.price).toFixed(2)}`
+      ]);
+      
+      let subtotal = 0, taxTotal = 0;
+      data.items.forEach(item => {
+        const amt = item.quantity * item.price;
+        subtotal += amt;
+        taxTotal += amt * (item.tax / 100);
+      });
+      const grand = subtotal + taxTotal;
+      
+      doc.autoTable({
+        startY: 90,
+        head: [['Description', 'Qty', 'Unit Price', 'Tax', 'Amount']],
+        body: tableRows,
+        foot: [[
+          '', '', '', 'Subtotal:', `${sym}${subtotal.toFixed(2)}`
+        ], [
+          '', '', '', 'Tax:', `${sym}${taxTotal.toFixed(2)}`
+        ], [
+          '', '', '', 'Total:', `${sym}${grand.toFixed(2)}`
+        ]],
+        theme: 'striped',
+        headStyles: { fillColor: [37, 99, 235] },
+        footStyles: { fillColor: [240, 245, 254], textColor: 0, fontStyle: 'bold' }
+      });
+      
+      // Notes
+      const finalY = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(10);
+      doc.text('Notes:', 20, finalY);
+      doc.text(data.notes || 'Thank you for your business!', 20, finalY + 7);
+      
+      // Footer
+      doc.setFontSize(8); doc.setTextColor(150);
+      doc.text('Generated by OmniInvoice · Dipto Design LLC', 105, 280, { align: 'center' });
+      
+      doc.save(`Invoice-${data.invoice.number}.pdf`);
+    }
+
+    function previewInvoice() {
+      const data = getFormData();
+      let itemsHtml = '';
+      let subtotal = 0, taxTotal = 0;
+      data.items.forEach(item => {
+        const amt = item.quantity * item.price;
+        subtotal += amt;
+        taxTotal += amt * (item.tax / 100);
+        itemsHtml += `<tr><td>${item.description}</td><td>${item.quantity}</td><td>${data.invoice.currency}${item.price.toFixed(2)}</td><td>${item.tax}%</td><td>${data.invoice.currency}${amt.toFixed(2)}</td></tr>`;
+      });
+      const grand = subtotal + taxTotal;
+      
+      const preview = `
+        <html><head><style>body{font-family:Inter; padding:2rem;} .invoice{max-width:800px; margin:auto;} h1{color:#2563eb;} table{width:100%; border-collapse:collapse;} th{background:#2563eb; color:white; padding:8px;} td{padding:8px; border-bottom:1px solid #ddd;} .total{text-align:right;}</style></head>
+        <body><div class="invoice">
+          <h1>INVOICE</h1>
+          <div style="display:flex; justify-content:space-between;">
+            <div><strong>${data.company.name}</strong><br>${data.company.address}<br>${data.company.email}<br>${data.company.phone}</div>
+            <div>Invoice #: ${data.invoice.number}<br>Date: ${data.invoice.date}<br>Due: ${data.invoice.dueDate}</div>
+          </div>
+          <hr>
+          <div><strong>Bill To:</strong><br>${data.client.name}<br>${data.client.company}<br>${data.client.address}<br>${data.client.email}</div>
+          <br>
+          <table><thead><tr><th>Description</th><th>Qty</th><th>Price</th><th>Tax</th><th>Amount</th></tr></thead>
+          <tbody>${itemsHtml}</tbody></table>
+          <div class="total"><p>Subtotal: ${data.invoice.currency}${subtotal.toFixed(2)}</p><p>Tax: ${data.invoice.currency}${taxTotal.toFixed(2)}</p><h2>Total: ${data.invoice.currency}${grand.toFixed(2)}</h2></div>
+          <p><em>${data.notes}</em></p>
+          <p style="margin-top:2rem; color:#666;">Generated by OmniInvoice · Dipto Design LLC</p>
+        </div></body></html>
+      `;
+      const win = window.open('', '_blank');
+      win.document.write(preview);
+      win.document.close();
+    }
+
+    document.getElementById('generatePDF').addEventListener('click', generatePDF);
+    document.getElementById('previewBtn').addEventListener('click', previewInvoice);
+
+    // Initial render
+    renderItems();
+  })();
+</script>
+</body>
+</html>
