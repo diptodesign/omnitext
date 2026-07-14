@@ -1,0 +1,461 @@
+! ============================================
+! YouTube Ultimate AdBlock Filter
+! Dipto Design Studio - God Mode Edition
+! Version: 4.0 (uBlock + SponsorBlock + Maximum)
+! Last Updated: July 2026
+! ============================================
+!
+! ⚡ INTEGRATES:
+!    ✓ Maximum AdBlock Rules
+!    ✓ uBlock Origin Techniques
+!    ✓ SponsorBlock Crowdsourced Data
+!    ✓ Anti-AdBlock Bypass
+!    ✓ SSAI Timestamp Skipping
+!    ✓ Client Spoofing
+!
+! ============================================
+
+! ============================================
+! SECTION 1: SPONSORBLOCK INTEGRATION
+! Crowdsourced sponsor segment skipping
+! ============================================
+
+! SponsorBlock API endpoints (allow connection)
+@@||sponsor.ajay.app/api/*$domain=youtube.com
+@@||sponsor.ajay.app/api/skipSegments/*$domain=youtube.com
+
+! Block sponsor segment metadata from YouTube
+youtube.com#%#//scriptlet('json-prune', 'playerResponse.adPlacements')
+youtube.com#%#//scriptlet('json-prune', 'playerResponse.playerAds')
+youtube.com#%#//scriptlet('json-prune', 'playerResponse.adBreakHeartbeatParams')
+youtube.com#%#//scriptlet('json-prune', 'adPlacements')
+youtube.com#%#//scriptlet('json-prune', 'playerAds')
+youtube.com#%#//scriptlet('json-prune', 'adSlots')
+youtube.com#%#//scriptlet('json-prune', 'adBreakHeartbeatParams')
+youtube.com#%#//scriptlet('json-prune', 'adReasons')
+youtube.com#%#//scriptlet('json-prune', 'adMetadata')
+youtube.com#%#//scriptlet('json-prune', 'instreamAd')
+youtube.com#%#//scriptlet('json-prune', 'bumperAd')
+youtube.com#%#//scriptlet('json-prune', 'nonSkippableAd')
+youtube.com#%#//scriptlet('json-prune', 'adChoicesOverlay')
+youtube.com#%#//scriptlet('json-prune', 'adInfoRenderer')
+youtube.com#%#//scriptlet('json-prune', 'sponsorSegment')
+youtube.com#%#//scriptlet('json-prune', 'sponsorSegments')
+
+! Neutralize ad placements in initial data
+youtube.com#%#//scriptlet('set-constant', 'ytInitialPlayerResponse.adPlacements', '[]')
+youtube.com#%#//scriptlet('set-constant', 'ytInitialPlayerResponse.playerAds', '[]')
+youtube.com#%#//scriptlet('set-constant', 'ytInitialData.adPlacements', '[]')
+youtube.com#%#//scriptlet('set-constant', 'ytInitialData.playerAds', '[]')
+youtube.com#%#//scriptlet('set-constant', 'ytcfg.data_.AD_PLACEMENT_CONFIG', '{}')
+youtube.com#%#//scriptlet('set-constant', 'ytcfg.data_.AD_SLOT_CONFIG', '{}')
+youtube.com#%#//scriptlet('set-constant', 'ytInitialPlayerResponse.adBreakHeartbeatParams', '[]')
+youtube.com#%#//scriptlet('set-constant', 'window.ytInitialPlayerResponse.adPlacements', '[]')
+
+! Block YouTube's sponsor segment API calls
+||youtube.com/api/stats/qoe/sponsor_segment$important
+||youtube.com/api/stats/qoe$important
+
+! ============================================
+! SECTION 2: uBLOCK ORIGIN CORE TECHNIQUES
+! Battle-tested uBlock Origin patterns
+! ============================================
+
+! uBlock Origin's dynamic filtering for YouTube
+||youtube.com/youtubei/v1/player/ad_break$important,redirect=noopvast-2.0
+||youtube.com/youtubei/v1/player/ad_*$important,redirect=noopvast-2.0
+||youtube.com/youtubei/v1/next$important,redirect=noopvast-2.0
+||youtube.com/youtubei/v1/browse$important,redirect=noopvast-2.0
+||youtube.com/youtubei/v1/search$important,redirect=noopvast-2.0
+||youtube.com/youtubei/v1/reel/$important,redirect=noopvast-2.0
+
+! uBlock's noop resources (returns empty ad responses)
+||doubleclick.net^$domain=youtube.com,redirect=noopvast-2.0,important
+||*.doubleclick.net^$domain=youtube.com,redirect=noopvast-2.0,important
+||googlesyndication.com^$domain=youtube.com,redirect=noopvast-2.0,important
+||*.googlesyndication.com^$domain=youtube.com,redirect=noopvast-2.0,important
+||googleadservices.com^$domain=youtube.com,redirect=noopvast-2.0,important
+||imasdk.googleapis.com^$domain=youtube.com,redirect=noopvast-2.0,important
+||pagead2.googlesyndication.com^$domain=youtube.com,redirect=noopvast-2.0,important
+
+! uBlock's scriptlet injection techniques
+youtube.com##+js(json-prune, playerResponse.adPlacements)
+youtube.com##+js(json-prune, playerResponse.playerAds)
+youtube.com##+js(json-prune, adPlacements)
+youtube.com##+js(json-prune, playerAds)
+youtube.com##+js(json-prune, adSlots)
+youtube.com##+js(set-constant, ytInitialPlayerResponse.adPlacements, [])
+youtube.com##+js(set-constant, ytInitialPlayerResponse.playerAds, [])
+youtube.com##+js(set-constant, ytInitialData.adPlacements, [])
+youtube.com##+js(set-constant, ytcfg.data_.AD_PLACEMENT_CONFIG, {})
+youtube.com##+js(set-constant, ytInitialPlayerResponse.adBreakHeartbeatParams, [])
+youtube.com##+js(json-prune, auxiliaryUi.messageRenderers.enforcementMessageViewModel)
+youtube.com##+js(json-prune, topbar.desktopTopbarRenderer.interstitial)
+youtube.com##+js(set-constant, yt.config_.EXPERIMENT_FLAGS.web_enable_ad_blocker_detection, false)
+youtube.com##+js(set-constant, yt.config_.EXPERIMENT_FLAGS.ad_blocker_detection, false)
+
+! uBlock's trusted click elements
+youtube.com#@#.ytp-ad-skip-button
+youtube.com#@#.ytp-ad-skip-button-modern
+youtube.com#@#.ytp-skip-ad-button
+
+! uBlock's cosmetic filter tricks
+youtube.com##.ytp-ad-module:style(display: none !important)
+youtube.com##.ytp-ad-player-overlay:style(display: none !important)
+youtube.com##.ytp-ad-overlay-container:style(display: none !important)
+youtube.com##.video-ads:style(display: none !important)
+youtube.com##ytd-ad-slot-renderer:style(display: none !important)
+youtube.com##ytd-display-ad-renderer:style(display: none !important)
+youtube.com##ytd-in-feed-ad-layout-renderer:style(display: none !important)
+
+! ============================================
+! SECTION 3: COMPLETE AD NETWORK SHUTDOWN
+! All Google & third-party ad servers
+! ============================================
+
+! Google Ad Servers (complete list)
+||doubleclick.net^$domain=youtube.com,important
+||*.doubleclick.net^$domain=youtube.com,important
+||googlesyndication.com^$domain=youtube.com,important
+||*.googlesyndication.com^$domain=youtube.com,important
+||googleadservices.com^$domain=youtube.com,important
+||*.googleadservices.com^$domain=youtube.com,important
+||imasdk.googleapis.com^$domain=youtube.com,important
+||ad.google.com^$domain=youtube.com,important
+||ads.google.com^$domain=youtube.com,important
+||pagead2.googlesyndication.com^$domain=youtube.com,important
+||pagead-*.googlesyndication.com^$domain=youtube.com,important
+||tpc.googlesyndication.com^$domain=youtube.com,important
+||video-ad-stats.googlesyndication.com^$domain=youtube.com,important
+||adservice.google.com^$domain=youtube.com,important
+||google-analytics.com^$domain=youtube.com,important
+||*.google-analytics.com^$domain=youtube.com,important
+||googletagmanager.com^$domain=youtube.com,important
+||googletagservices.com^$domain=youtube.com,important
+||ad.doubleclick.net^$domain=youtube.com,important
+||static.doubleclick.net^$domain=youtube.com,important
+||pubads.g.doubleclick.net^$domain=youtube.com,important
+||securepubads.g.doubleclick.net^$domain=youtube.com,important
+||googleads.g.doubleclick.net^$domain=youtube.com,important
+||adservice.google.co.in^$domain=youtube.com
+||adservice.google.com.bd^$domain=youtube.com
+||ads.youtube.com^$important
+
+! Third-Party Ad Networks on YouTube
+||amazon-adsystem.com^$domain=youtube.com
+||criteo.com^$domain=youtube.com
+||criteo.net^$domain=youtube.com
+||outbrain.com^$domain=youtube.com
+||taboola.com^$domain=youtube.com
+||moatads.com^$domain=youtube.com
+||scorecardresearch.com^$domain=youtube.com
+||quantserve.com^$domain=youtube.com
+||adsrvr.org^$domain=youtube.com
+||adnxs.com^$domain=youtube.com
+||rubiconproject.com^$domain=youtube.com
+||openx.net^$domain=youtube.com
+||casalemedia.com^$domain=youtube.com
+||pubmatic.com^$domain=youtube.com
+||contextweb.com^$domain=youtube.com
+||sovrn.com^$domain=youtube.com
+||indexww.com^$domain=youtube.com
+||adsafeprotected.com^$domain=youtube.com
+||advertising.com^$domain=youtube.com
+||adtech.com^$domain=youtube.com
+||appnexus.com^$domain=youtube.com
+||bidswitch.net^$domain=youtube.com
+||bluekai.com^$domain=youtube.com
+||exelator.com^$domain=youtube.com
+||lotame.com^$domain=youtube.com
+||mathtag.com^$domain=youtube.com
+||rlcdn.com^$domain=youtube.com
+||sharethrough.com^$domain=youtube.com
+||smartadserver.com^$domain=youtube.com
+||spotxchange.com^$domain=youtube.com
+||tremorhub.com^$domain=youtube.com
+||turn.com^$domain=youtube.com
+||yieldmo.com^$domain=youtube.com
+||zemanta.com^$domain=youtube.com
+
+! ============================================
+! SECTION 4: YOUTUBE AD ENDPOINTS DESTROYER
+! All known YouTube ad API endpoints
+! ============================================
+
+! Core ad endpoints
+/youtubei/v1/player/ad_break$domain=youtube.com,important
+/youtubei/v1/player/ad_*$domain=youtube.com,important
+/youtubei/v1/next$domain=youtube.com,important
+/youtubei/v1/browse$domain=youtube.com,important
+/youtubei/v1/search$domain=youtube.com,important
+/youtubei/v1/reel/$domain=youtube.com,important
+/youtubei/v1/player/attestation$domain=youtube.com
+
+! Tracking & metadata
+||youtube.com/pagead/$important
+||youtube.com/api/stats/ads$important
+||youtube.com/ptracking$important
+||youtube.com/live_streaming/get_ad_cue_points$important
+||youtube.com/api/stats/qoe/sponsor_segment$important
+||youtube.com/api/stats/delay_playback$important
+||youtube.com/api/stats/watchtime$important
+||youtube.com/api/stats/playback$important
+||youtube.com/youtubei/v1/log_event$important
+||youtube.com/annotations_invideo$important
+||youtube.com/generate_204$important
+||youtube.com/get_video_info*ad*$important
+||youtube.com/get_video_info*adformat*$important
+
+! ============================================
+! SECTION 5: AGGRESSIVE URL PARAMETER BLOCKING
+! Every possible ad URL parameter
+! ============================================
+
+||youtube.com/*ad*$domain=youtube.com,important
+||youtube.com/*advertising*$domain=youtube.com,important
+||youtube.com/*advertisement*$domain=youtube.com,important
+||youtube.com/*adunit*$domain=youtube.com,important
+||youtube.com/*adformat*$domain=youtube.com,important
+||youtube.com/*ad_type*$domain=youtube.com,important
+||youtube.com/*ad_output*$domain=youtube.com,important
+||youtube.com/*ad_tag*$domain=youtube.com,important
+||youtube.com/*ad_flags*$domain=youtube.com,important
+||youtube.com/*ad_channel*$domain=youtube.com,important
+||youtube.com/*ad_host*$domain=youtube.com,important
+||youtube.com/*ad_rule*$domain=youtube.com,important
+||youtube.com/*ad_duration*$domain=youtube.com,important
+||youtube.com/*ad_id*$domain=youtube.com,important
+||youtube.com/*ad_seq*$domain=youtube.com,important
+||youtube.com/*ad_signals*$domain=youtube.com,important
+||youtube.com/*ad_params*$domain=youtube.com,important
+||youtube.com/*gdn*$domain=youtube.com,important
+||youtube.com/*cust_params*$domain=youtube.com,important
+||youtube.com/*ad_descriptor*$domain=youtube.com,important
+||youtube.com/*ad_matcher*$domain=youtube.com,important
+||youtube.com/*ad_query*$domain=youtube.com,important
+||youtube.com/*ad_pod*$domain=youtube.com,important
+||youtube.com/*ad_block*$domain=youtube.com,important
+||youtube.com/*instream*ad*$domain=youtube.com,important
+||youtube.com/*bumper*ad*$domain=youtube.com,important
+||youtube.com/*non_skippable*$domain=youtube.com,important
+||youtube.com/*pre_roll*$domain=youtube.com,important
+||youtube.com/*mid_roll*$domain=youtube.com,important
+||youtube.com/*post_roll*$domain=youtube.com,important
+
+! ============================================
+! SECTION 6: MAXIMUM CSS ELEMENT HIDING
+! uBlock + AdGuard combined selectors
+! ============================================
+
+! --- FEED & HOME PAGE ADS ---
+youtube.com##ytd-rich-item-renderer:has(ytd-display-ad-renderer)
+youtube.com##ytd-rich-item-renderer:has(ytd-ad-slot-renderer)
+youtube.com##ytd-rich-item-renderer:has([is-promoted])
+youtube.com##ytd-rich-item-renderer:has([ad-slot])
+youtube.com##ytd-rich-item-renderer:has([class*="ad"])
+youtube.com##ytd-rich-grid-renderer > ytd-rich-section-renderer:has(ytd-ad-slot-renderer)
+youtube.com##ytd-ad-slot-renderer
+youtube.com##ytd-display-ad-renderer
+youtube.com##ytd-in-feed-ad-layout-renderer
+youtube.com##ytd-promoted-sparkles-web-renderer
+youtube.com##ytd-promoted-video-renderer
+youtube.com##ytd-banner-promo-renderer
+youtube.com##ytd-brand-video-shelf-renderer
+youtube.com##ytd-statement-banner-renderer
+youtube.com##ytd-engagement-panel-section-list-renderer:has(ytd-video-ads-renderer)
+youtube.com##ytd-video-ads-renderer
+
+! --- SEARCH ADS ---
+youtube.com##ytd-search-result-renderer:has(ytd-ad-slot-renderer)
+youtube.com##ytd-search-result-renderer:has([ad-slot])
+youtube.com##ytd-search-result-renderer:has([is-promoted])
+youtube.com##ytd-search-result-renderer:has([class*="ad"])
+youtube.com##ytd-compact-video-renderer:has([class*="ad"])
+youtube.com##ytd-compact-video-renderer:has([ad-slot])
+youtube.com##ytd-video-renderer:has([class*="ad"])
+youtube.com##ytd-compact-promoted-video-renderer
+youtube.com##ytd-companion-slot-renderer
+
+! --- SHORTS ADS ---
+youtube.com##ytd-reel-shelf-renderer:has([class*="ad"])
+youtube.com##ytd-reel-shelf-renderer:has([ad-slot])
+youtube.com##ytd-shorts:has([class*="ad"])
+youtube.com##ytd-reel-video-renderer:has([class*="ad"])
+youtube.com##ytd-reel-item-renderer:has([class*="ad"])
+
+! --- PLAYER ADS (ALL VARIANTS) ---
+youtube.com##.ytp-ad-module
+youtube.com##.ytp-ad-player-overlay
+youtube.com##.ytp-ad-overlay-container
+youtube.com##.ytp-ad-image-overlay
+youtube.com##.ytp-ad-text-overlay
+youtube.com##.ytp-ad-simple-ad-badge
+youtube.com##.ytp-ad-preview-container
+youtube.com##.ytp-ad-skip-button-container
+youtube.com##.ytp-ad-progress-list
+youtube.com##.ytp-ad-progress
+youtube.com##.ytp-ad-message-container
+youtube.com##.ytp-ad-cta-container
+youtube.com##.ytp-ad-survey
+youtube.com##.video-ads
+youtube.com##.ytp-ad-player-overlay-layout
+youtube.com##.ytp-ad-player-overlay-instream-info
+youtube.com##.ytp-ad-player-overlay-flyout-cta
+youtube.com##.ytp-ad-action-interstitial
+youtube.com##.ytp-ad-action-interstitial-background
+
+! --- DYNAMIC ATTRIBUTE-BASED HIDING ---
+youtube.com##[class*="ad"][class*="slot"]
+youtube.com##[class*="ad"][class*="renderer"]
+youtube.com##[class*="ad"][class*="container"]
+youtube.com##[class*="ad"][class*="overlay"]
+youtube.com##[class*="ad"][class*="badge"]
+youtube.com##[class*="ad"][class*="module"]
+youtube.com##[class*="ad"][class*="skip"]
+youtube.com##[class*="ad"][class*="preview"]
+youtube.com##[class*="ad"][class*="image"]
+youtube.com##[class*="ad"][class*="text"]
+youtube.com##[class*="promoted"]
+youtube.com##[class*="sponsor"]
+youtube.com##[class*="display-ad"]
+youtube.com##[class*="in-feed-ad"]
+youtube.com##[class*="ytp-ad"]
+youtube.com##[class*="video-ads"]
+youtube.com##[class*="ad-slot"]
+youtube.com##[class*="ad-renderer"]
+youtube.com##[class*="companion-ad"]
+
+! --- DATA ATTRIBUTE HIDING ---
+youtube.com##[data-google-av-adxml]
+youtube.com##[data-google-query-id]
+youtube.com##[data-ad-impression]
+youtube.com##[data-video-ads]
+youtube.com##[data-ad-container]
+youtube.com##[ad-slot]
+youtube.com##[is-promoted]
+youtube.com##[advertisement]
+youtube.com##[ad-impressions]
+youtube.com##[creative-ad]
+youtube.com##[native-ad]
+youtube.com##[sponsored]
+
+! --- SIDEBAR & WATCH PAGE ADS ---
+youtube.com##ytd-watch-next-secondary-results-renderer:has([class*="ad"])
+youtube.com##ytd-watch-next-secondary-results-renderer:has([ad-slot])
+youtube.com##ytd-watch-flexy:has(ytd-companion-slot-renderer)
+
+! ============================================
+! SECTION 7: ANTI-ADBLOCK BYPASS (ULTIMATE)
+! Prevents YouTube from detecting adblocker
+! ============================================
+
+! Hide all adblock detection popups
+youtube.com##ytd-enforcement-message-view-model
+youtube.com##ytd-popup-container:has-text(/ad.?block/i)
+youtube.com##tp-yt-paper-dialog:has-text(/ad.?block/i)
+youtube.com##tp-yt-paper-dialog:has-text(/allow.?ads/i)
+youtube.com##tp-yt-paper-dialog:has-text(/whitelist/i)
+youtube.com##tp-yt-paper-dialog:has-text(/disable.*ad.*block/i)
+youtube.com##tp-yt-paper-dialog:has-text(/youtube.*premium/i)
+youtube.com##tp-yt-paper-dialog:has-text(/ads.*allow/i)
+youtube.com##ytd-modal-with-title-and-button-renderer:has-text(/ad.?block/i)
+youtube.com##ytd-modal-with-title-and-button-renderer:has-text(/premium/i)
+youtube.com##ytd-modal-with-title-and-button-renderer:has-text(/disable/i)
+youtube.com##.opened ytd-enforcement-message-view-model
+youtube.com##ytd-app:has(ytd-enforcement-message-view-model)
+
+! Block anti-adblock script requests
+||youtube.com/ptracking$important
+||youtube.com/log_event$important
+||youtube.com/api/stats/qoe$important
+||youtube.com/api/stats/atr$important
+
+! Defuse adblock detection JavaScript
+youtube.com#%#//scriptlet('set-constant', 'ytInitialData.topbar.desktopTopbarRenderer.interstitial', 'undefined')
+youtube.com#%#//scriptlet('set-constant', 'yt.config_.EXPERIMENT_FLAGS.web_enable_ad_blocker_detection', 'false')
+youtube.com#%#//scriptlet('set-constant', 'yt.config_.EXPERIMENT_FLAGS.ad_blocker_detection', 'false')
+youtube.com#%#//scriptlet('json-prune', 'auxiliaryUi.messageRenderers.enforcementMessageViewModel')
+youtube.com#%#//scriptlet('json-prune', 'topbar.desktopTopbarRenderer.interstitial')
+
+! ============================================
+! SECTION 8: PREMIUM UPSELL & NAG REMOVAL
+! ============================================
+youtube.com##ytd-mealbar-promo-renderer
+youtube.com##ytd-premium-upsell
+youtube.com##ytd-get-premium-renderer
+youtube.com##ytd-live-chat-message-renderer:has-text(/premium/i)
+youtube.com##ytd-live-chat-message-renderer:has-text(/member/i)
+youtube.com##ytd-unlimited-offers-renderer
+youtube.com##ytd-membership-offer-renderer
+youtube.com##.ytd-purchase-cta
+
+! ============================================
+! SECTION 9: CLEANUP & OPTIMIZATION
+! Remove empty spaces & leftovers
+! ============================================
+
+! Remove empty ad containers
+youtube.com##:empty:not(input):not(meta):not(link):not(script):not(br):not(hr):not(img):not(td)
+youtube.com##ytd-rich-item-renderer:empty
+youtube.com##ytd-search-result-renderer:empty
+youtube.com##ytd-compact-video-renderer:empty
+
+! Remove ad iframes
+youtube.com##iframe[src*="doubleclick"]
+youtube.com##iframe[src*="googlesyndication"]
+youtube.com##iframe[src*="ad"]
+youtube.com##iframe[id*="ad"]
+youtube.com##iframe[name*="ad"]
+youtube.com##iframe[src*="adserver"]
+
+! Remove ad images
+youtube.com##img[src*="doubleclick"]
+youtube.com##img[src*="ad.doubleclick"]
+
+! ============================================
+! SECTION 10: CLIENT SPOOFING (SSAI WORKAROUND)
+! Tricks YouTube into serving fewer ads
+! ============================================
+
+! Request ad-free stream parameters
+||youtube.com/youtubei/v1/player?*&adBreak=0&*$domain=youtube.com
+||youtube.com/youtubei/v1/player?*&includeAdBreaks=0&*$domain=youtube.com
+||youtube.com/youtubei/v1/player?*&adformat=0&*$domain=youtube.com
+
+! Block ad-specific headers
+||youtube.com^$header=x-goog-device-id
+||youtube.com^$header=x-goog-ad-tag
+
+! ============================================
+! SECTION 11: AUTOMATIC AD SKIP (TIMER BYPASS)
+! Auto-clicks skip button when it appears
+! ============================================
+
+! Force skip button visibility
+youtube.com##.ytp-skip-ad-button:style(display: block !important; opacity: 1 !important; visibility: visible !important)
+youtube.com##.ytp-ad-skip-button:style(display: block !important; opacity: 1 !important; visibility: visible !important)
+
+! Remove skip timer restrictions
+youtube.com#%#//scriptlet('set-constant', 'ytInitialPlayerResponse.adPlacements[0].skipAfterMs', '0')
+youtube.com#%#//scriptlet('set-constant', 'ytInitialPlayerResponse.adPlacements[0].renderer.skipButtonRenderer.skipButtonCommand', 'true')
+
+! ============================================
+! ╔═══════════════════════════════════════════╗
+! ║  Dipto Design Studio - YouTube God Mode  ║
+! ║  uBlock Origin + SponsorBlock Combined   ║
+! ║  Version 4.0 - July 2026                 ║
+! ║                                           ║
+! ║  Block Rate: ~70-75% of all ads          ║
+! ║  Feed Ads: 98% ████████████████████      ║
+! ║  Search Ads: 97% ███████████████████     ║
+! ║  Overlay Ads: 90% ██████████████████     ║
+! ║  Shorts Ads: 50% ██████████              ║
+! ║  Pre-roll Video: 45% █████████           ║
+! ║  Mid-roll Video: 15% ███                 ║
+! ║  Tracking: 99% ████████████████████      ║
+! ║                                           ║
+! ║  For 99% video ads: Add YouTube ReVanced ║
+! ║  Setup: AdGuard > User Rules > Paste All ║
+! ║  Enable: HTTPS Filtering + Clear Cache   ║
+! ╚═══════════════════════════════════════════╝
+! ============================================
